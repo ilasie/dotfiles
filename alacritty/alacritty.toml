@@ -1,0 +1,7 @@
+[window]
+opacity = 0.8
+padding = { x = 0, y = 0 }
+
+[font]
+normal = { family = "WenQuanYi Micro Hei Mono", style = "Regular" }
+size = 10.0
