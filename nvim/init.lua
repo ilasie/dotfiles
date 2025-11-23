@@ -63,6 +63,19 @@ require("lazy").setup({
       main = "rainbow-delimiters.setup",
       opts = {}
     },
+    {
+      "folke/noice.nvim",
+      event = "VeryLazy",
+      dependencies = {
+        -- if you lazy-load any plugin below, make sureto add proper 'module="..."' entries
+        "MunifTanjim/nui.nvim",
+        -- OPTIONAL:
+        -- `nvim-notify` is noly needed, fi you want to use the notification view.
+        -- If not available, we use `mini` as the fallback
+        "rcarriga/nvim-notify",
+      },
+      opts = {}
+    },
     
     {
       "nvim-treesitter/nvim-treesitter",
@@ -180,26 +193,14 @@ require("lazy").setup({
       },
       ft = { "markdown" },
       build = function() vim.fn["mkdp#util#install"]() end,
-    },
-
-    {
-      "folke/noice.nvim",
-      event = "VeryLazy",
-      dependencies = {
-        -- if you lazy-load any plugin below, make sureto add proper 'module="..."' entries
-        "MunifTanjim/nui.nvim",
-        -- OPTIONAL:
-        -- `nvim-notify` is noly needed, fi you want to use the notification view.
-        -- If not available, we use `mini` as the fallback
-        "rcarriga/nvim-notify",
-      },
-      opts = {}
-    },
+    }, 
   },
 	install = { colorscheme = { "catppuccin" } },
 	checker = { enable = true }
 })
 
+-- LSP
+-- c
 vim.lsp.config.clangd = {
   cmd = {
     "clangd",
@@ -211,9 +212,45 @@ vim.lsp.config.clangd = {
   filetypes = { "c", "cpp" },
 }
 vim.lsp.enable("clangd")
-
+-- rust
 vim.lsp.config.rust = {
   cmd = { "rust-analyzer" },
   filetypes = { "rust" },
 }
 vim.lsp.enable("rust")
+-- python
+local function start_python_lsp(bufnr)
+  local root_markers = {
+    "pyproject.toml",
+    "setup.py",
+    ".git"
+  }
+  local root = vim.fs.dirname(
+    vim.fs.find(
+      root_markers, { upward = true, path = vim.api.nvim_buf_get_name(bufnr) }
+    )[1]
+  )
+  if not root then
+    root = vim.fs.dirname(vim.api.nvim_buf_get_name(bufnr))
+  end
+
+  vim.lsp.start({
+    name = "pyright",
+    cmd = { "pyright-langserver", "--stdio" },
+    root_dir = root,
+    settings = { python = { analysis = {
+      autoSearchPaths = true,
+      useLibraryCodeForTypes = true,
+      typeCheckingMode = "basic",
+    }}}
+  })
+end
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "python",
+  callback = function(ev)
+    if not vim.lsp.get_clients({buffer = ev.buf, name = "pyright"})[1] then
+      start_python_lsp(ev.buf)
+    end
+  end,
+})

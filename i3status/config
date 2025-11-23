@@ -19,36 +19,36 @@ order += "tztime local"
 order += "volume master"
 
 wireless _first_ {
-  format_up = "W:(%quality %essid)"
-  format_down = "W:down"
+  format_up = "󰖩 %essid(%quality)"
+  format_down = "󰖪 "
 }
 
 battery all {
   format = "%status %percentage"
   last_full_capacity = true # Do not use design capacity
-  status_chr = ⚡
-  status_bat = 🔋
-  status_unk = ?
-  status_full = ☻
+  status_chr = " "
+  status_bat = " "
+  status_unk = " "
+  status_full = " "
 }
 
 disk "/" {
-  format = "%avail"
+  format = " %percentage_used"
 }
 
 memory {
-  format = "%used/%available"
+  format = "󰍛 %percentage_used"
   threshold_degraded = "1G"
   format_degraded = "MEMORY < %available"
 }
 
 tztime local {
-  format = "%Y-%m-%d %H:%M:%S"
+  format = " %Y-%m-%d  %H:%M:%S"
 }
 
 volume master {
-        format = "♪: %volume"
-        format_muted = "♪: muted (%volume)"
+        format = "  %volume"
+        format_muted =" (%volume)"
         device = "default"
         mixer = "Master"
         mixer_idx = 0

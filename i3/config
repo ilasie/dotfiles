@@ -217,12 +217,16 @@ bindsym $mod+r mode "resize"
 # finds out, if available)
 bar {
   position top
-  font pango:monospace 16
-  height 30
+  font pango:JetBrainsMono Nerd Font 14
+  height 26
   status_command i3status
 }
 # exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 
 # Screen shot
 bindsym Print exec --no-startup-id sh -c 'file="$HOME/Pictures/screenshots/$(date +\%Y\%m\%d\%H\%M\%S).png" && scrot $file && dunstify -t 2000 -u low "Screen Shot" "Saved to $(basename $file)"'
+bindsym Shift+Print exec --no-startup-id sh -c 'file="$HOME/Pictures/screenshots/$(date +\%Y\%m\%d\%H\%M\%S).png" && scrot -s $file && dunstify -t 2000 -u low "Screen Shot" "Saved to $(basename $file)"'
 
+# System Monitor
+# battery low
+exec --no-startup-id $HOME/.config/i3/scripts/battery-monitor.sh
