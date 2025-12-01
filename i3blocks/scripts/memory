@@ -1,0 +1,4 @@
+#!/bin/bash
+MEM_USED=$(/bin/free | /bin/awk 'NR==2{printf "%.0f", $3/$2 * 100.0}')
+echo "󰍛 ${MEM_USED}%"
+

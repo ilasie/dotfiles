@@ -1,0 +1,8 @@
+#!/bin/bash
+ESSID=$(/sbin/iwgetid -r 2>/dev/null)
+if [ -n "$ESSID" ]; then
+  QUALITY=$(awk 'NR==3 {print int($3*100/70)}' /proc/net/wireless 2>/dev/null || echo "?")
+  echo "󰖩 ${ESSID}(${QUALITY}%)"
+else
+  echo "󰖪 "
+fi

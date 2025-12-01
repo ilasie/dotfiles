@@ -22,21 +22,25 @@ vim.g.maplocalleader = "\\"
 vim.opt.number = true
 vim.opt.relativenumber = true
 
+vim.opt.cursorline = true
+
 vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
 vim.opt.softtabstop = -1
 vim.opt.expandtab = true
 
+-- enable system clipboard
+vim.opt.clipboard:append("unnamedplus")
+
 require("lazy").setup({
 	spec = {
 		{
-      "catppuccin/nvim",
-      name = "catppuccin",
+      "ellisonleao/gruvbox.nvim",
       priority = 1000,
       opts = { },
       config = function(_, opts)
-        require("catppuccin").setup(opts)
-        vim.cmd.colorscheme("catppuccin")
+        require("gruvbox").setup(opts)
+        vim.cmd.colorscheme("gruvbox")
       end
     },
 		{

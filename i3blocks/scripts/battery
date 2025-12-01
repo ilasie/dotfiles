@@ -1,0 +1,17 @@
+#!/bin/bash
+BAT=$(/bin/ls /sys/class/power_supply/ | grep -E '^BAT|battery' | head -n1)
+if [ -z "$BAT" ]; then
+  exit 0
+fi
+
+STATUS=$(/bin/cat /sys/class/power_supply/$BAT/status 2>/dev/null || echo "Unknown")
+CAPACITY=$(/bin/cat /sys/class/power_supply/$BAT/capacity 2>/dev/null || echo "?")
+
+case "$STATUS" in
+  Charging|Unknown) ICON="" ;;
+  Discharging) ICON="" ;;
+  Full) ICON="" ;;
+  *) ICON="" ;;
+esac
+
+echo "${ICON} ${CAPACITY}%"

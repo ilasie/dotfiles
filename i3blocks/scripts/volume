@@ -1,0 +1,19 @@
+#!/bin/bash
+export LC_ALL=C
+
+SINK=$(/bin/pactl info | /bin/grep -F 'Default Sink:' | /bin/cut -d' ' -f3-)
+
+if [ -z "$SINK" ]; then
+  echo " ?%"
+  exit 0
+fi
+
+MUTED=$(/bin/pactl get-sink-mute "$SINK" | /bin/awk '{print $2}')
+VOL_INFO=$(/bin/pactl get-sink-volume "$SINK")
+VOL=$(echo "$VOL_INFO" | /bin/awk -F'%' '/Volume:/ {gsub(/.* \/ /, "", $1); print $1; exit}' | tr -d ' ')
+
+if [ "$MUTED" = "yes" ]; then
+  echo " (${VOL}%)"
+else
+  echo "  ${VOL}%"
+fi

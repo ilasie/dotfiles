@@ -1,0 +1,3 @@
+#!/bin/bash
+USE_PCT=$(/bin/df / | awk 'NR==2 { gsub(/%/,""); print $5 }')
+echo " ${USE_PCT}%"

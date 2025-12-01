@@ -1,0 +1,12 @@
+#!/bin/bash
+WINID=$(/bin/xprop -root _NET_ACTIVE_WINDOW | /bin/awk '{print $5}')
+if [ "$WINID" = "0x0" ] || [ -z "WINID" ]; then
+  exit 0
+fi
+
+TITLE=$(/bin/xprop -id "$WINID" _NET_WM_NAME 2>/dev/null | /bin/cut -d '"' -f 2)
+
+if [ -n "$TITLE" ]; then
+  TITLE=$(echo "$TITLE" | sed 's/%/%%/g')
+  echo "$TITLE"
+fi

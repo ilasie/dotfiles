@@ -1,0 +1,24 @@
+#!/bin/bash
+
+BACKLIGHT="/sys/class/backlight"
+if [ ! -d "$BACKLIGHT" ]; then
+  echo "󰳲 N/A"
+  exit 0
+fi
+
+DEVICE=$(/bin/ls "$BACKLIGHT" | /bin/head -n1)
+if [ -z "DEVICE" ]; then
+  echo "󰳲 N/A"
+  exit 0
+fi
+
+MAX=$(/bin/cat "$BACKLIGHT/$DEVICE/max_brightness" 2>/dev/null)
+CUR=$(/bin/cat "$BACKLIGHT/$DEVICE/brightness" 2>/dev/null)
+
+if [ -z "$MAX" ] || [ -z "$CUR" ]; then
+  echo "󰳲 ERR"
+  exit 1
+fi
+
+PREC=$(( (CUR * 100 + MAX / 2) /MAX ))
+echo "󰳲 ${PREC}%"
