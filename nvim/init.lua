@@ -68,6 +68,14 @@ require("lazy").setup({
       opts = {}
     },
     {
+      "norcalli/nvim-colorizer.lua",
+      config=function()
+        require("colorizer").setup({"*"}, {
+          RRGGBB = true
+        })
+      end
+    },
+    {
       "folke/noice.nvim",
       event = "VeryLazy",
       dependencies = {
@@ -224,37 +232,53 @@ vim.lsp.config.rust = {
 vim.lsp.enable("rust")
 -- python
 local function start_python_lsp(bufnr)
-  local root_markers = {
-    "pyproject.toml",
-    "setup.py",
-    ".git"
-  }
-  local root = vim.fs.dirname(
-    vim.fs.find(
-      root_markers, { upward = true, path = vim.api.nvim_buf_get_name(bufnr) }
-    )[1]
-  )
-  if not root then
-    root = vim.fs.dirname(vim.api.nvim_buf_get_name(bufnr))
-  end
+  local bufname = vim.api.nvim_buf_get_name(bufnr)
+  if bufname == "" then return end
 
+  local root_markers = { "pixi.toml", "pyproject.toml", "setup.py", ".git" }
+  local matches = vim.fs.find(root_markers, { upward = true, path = bufname })
+  local root = #matches > 0 and vim.fs.dirname(matches[1]) or vim.fs.dirname(bufname)
+  
+  if not vim.fs.find("pixi.toml", { path = root, limit = 1 })[1] then return end
+
+  local handle = io.popen(
+    "cd " .. vim.fn.shellescape(root) ..
+    " && pixi run python -c 'import sysconfig; print(sysconfig.get_path(\"purelib\"))' 2>/dev/null"
+  )
+  local site_packages = handle and handle:read("*l") or nil
+  if handle then handle:close() end
+  
+  local extra_paths = {}
+  if site_packages then table.insert(extra_paths, site_packages) end
+  
   vim.lsp.start({
     name = "pyright",
     cmd = { "pyright-langserver", "--stdio" },
     root_dir = root,
-    settings = { python = { analysis = {
-      autoSearchPaths = true,
-      useLibraryCodeForTypes = true,
-      typeCheckingMode = "basic",
-    }}}
+    settings = {
+      python = {
+        analysis = {
+          autoSearchPaths = true,
+          useLibraryCodeForTypes = true,
+          typeCheckingMode = "basic",
+          extraPaths = extra_paths,
+        }
+      }
+    }
   })
 end
 
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "python",
   callback = function(ev)
-    if not vim.lsp.get_clients({buffer = ev.buf, name = "pyright"})[1] then
+    if not vim.b[ev.buf].pyright_started then
+      vim.b[ev.buf].pyright_started = true
       start_python_lsp(ev.buf)
     end
   end,
+})
+
+-- inline diagnose
+vim.diagnostic.config({
+  virtual_text = true,
 })
