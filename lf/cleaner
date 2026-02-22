@@ -1,0 +1,4 @@
+#!/bin/sh
+# from ueberzugpp/scripts/lf/cleaner
+
+ueberzugpp cmd -s $UB_SOCKET -a remove -i PREVIEW

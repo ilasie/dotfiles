@@ -1,0 +1,62 @@
+# lfrc
+# author: ilasie
+# since: 2026
+
+set shell /bin/sh
+set shellopts '-eu'
+set ifs "\n"
+
+set preview true
+set previewer ~/.config/lf/preview
+set cleaner ~/.config/lf/cleaner
+set icons true
+
+set info size:time
+set dircounts true
+set number true
+set relativenumber true
+set ratios 1:2:3
+set drawbox true
+
+
+cmd extract %{{
+  printf "extract file?[y/n]"
+  read choice
+  if [ "$choice" = "y" ]; then
+  case "$f" in
+    *.tar) tar xf "$f" ;;
+    *.zip|*.apk) unzip "$f" -d "$(basename $f | sed -E 's/.apk$|.zip$//')" ;;
+    *.7z) 7z x "$f" ;;
+    *.tar.gz|*.tgz|*.taz) tar xzf "$f" ;;
+    *.gz) gunzip -k "$f" ;;
+    *.tar.bz2|*.tbz2|*.tbz|*.tz2|*.tb2) tar xjf "$f" ;;
+    *.bz2) bzip2 -dk "$f" ;;
+    *.tar.xz|*.txz) tar xJf "$f" ;;
+    *.xz) xz -dk "$f" ;;
+    *.tar.zst|*.tzst) tar xf "$f" --zstd ;;
+    *.zst) zstd -dk "$f" ;;
+    *.rar) unrar-free -x "$f" ;;
+    esac
+  fi
+  lf -remote "send clear"
+}}
+map xx extract
+
+cmd toggle-preview %{{
+  if [ "$lf_preview" = true ]; then
+    lf -remote "send $id :set preview false; set ratios 1:5"
+  else
+    lf -remote "send $id :set preview true; set ratios 1:2:3"
+  fi
+}}
+
+
+map .r source ~/.config/lf/lfrc
+
+map f :filter
+
+map o :push %touch<space>
+map O :push %mkdir<space>
+map a :rename
+map e $$EDITOR "$f"
+map D delete
