@@ -1,0 +1,42 @@
+#!/bin/bash
+# ~/.local/bin/i3exit
+
+lock() {
+  i3lock \
+    --nofork \
+    --color=00000022 \
+    --inside-color=00000022 \
+    --ring-color=98971ae6 \
+    --keyhl-color=d79921e6 \
+    --bshl-color=d79921e6 \
+    --separator-color=458588e6 \
+    --insidever-color=00000022 \
+    --ringver-color=98971ae6 \
+    --verif-color=98971ae6 \
+    --insidewrong-color=00000022 \
+    --ringwrong-color=cc241de6 \
+    --wrong-color=cc241de6 \
+    --time-color=98971aE6 \
+    --date-color=98971aE6 \
+    --blur 9 \
+    --clock
+}
+
+case "$1" in
+  lock)
+    lock ;;
+  logout)
+    i3-msg exit ;;
+  suspend)
+    lock && systemctl suspend ;;
+  hibernate)
+    lock && systemctl hibernate ;;
+  reboot)
+    systemctl reboot ;;
+  poweroff)
+    systemctl poweroff ;;
+  *)
+    echo "Usage: $0 {lock|logout|suspend|hibernate|reboot|poweroff}"
+    exit 1
+    ;;
+esac

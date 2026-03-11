@@ -1,0 +1,18 @@
+#!/bin/bash
+# require dmenu
+
+i3exit=$HOME/.local/bin/i3exit
+chosen=$(
+  echo -e "Lock\nLogout\nReboot\nPoweroff" | \
+  dmenu -p "Session" -sb "#b8bb26" -sf "#101010" -fn "monospace 14"
+)
+case "$chosen" in
+  "Lock")
+    $i3exit lock ;;
+  "Logout")
+    $i3exit logout ;;
+  "Reboot")
+    $i3exit reboot ;;
+  "Poweroff")
+    $i3exit poweroff ;;
+esac
