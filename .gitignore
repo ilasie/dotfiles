@@ -1,5 +1,5 @@
-qutebrowser/autoconfig.yml
-qutebrowser/bookmarks
-qutebrowser/greasemonkey
-qutebrowser/qsettings
-qutebrowser/quickmarks
+.config/qutebrowser/autoconfig.yml
+.config/qutebrowser/bookmarks/**
+.config/qutebrowser/greasemonkey/**
+.config/qutebrowser/qsettings/**
+.config/qutebrowser/quickmarks
