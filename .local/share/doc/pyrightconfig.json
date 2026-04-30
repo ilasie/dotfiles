@@ -1,0 +1,9 @@
+{
+  "venvPath": ".",
+  "venv": ".pixi/envs/default",
+  "exclude": [
+    "**/.git",
+    "**/__pycache__",
+    "**/.pixi"
+  ]
+}
