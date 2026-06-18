@@ -21,5 +21,8 @@ require("lazy").setup({
   spec = { { import = "plugin" } },
   install = { colorscheme = { "gruvbox" } },
   checker = { enabled = false },
-  ui = { border = "rounded" }
+  ui = { border = "rounded" },
+  git = {
+    timeout = 300,
+  }
 })

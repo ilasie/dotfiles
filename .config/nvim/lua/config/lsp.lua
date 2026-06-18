@@ -1,3 +1,7 @@
 vim.lsp.enable('clangd')
 vim.lsp.enable('rust_analyzer')
 vim.lsp.enable('html')
+vim.lsp.enable('css')
+vim.lsp.enable('typescript')
+vim.lsp.enable('zls')
+vim.lsp.enable('lean')
