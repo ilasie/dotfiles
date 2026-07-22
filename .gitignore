@@ -3,3 +3,8 @@
 .config/qutebrowser/greasemonkey/**
 .config/qutebrowser/qsettings/**
 .config/qutebrowser/quickmarks
+
+.config/emacs/auto-save-list
+.config/emacs/eln-cache
+.config/emacs/elpa
+.config/emacs/ido.last
