@@ -1,0 +1,41 @@
+#!/bin/sh
+
+# ----
+# logman - logging session manager
+# ilasie 2026
+# ----
+
+logman_bin=~/.local/bin/i3exit
+
+lock="Lock"
+logout="Log out"
+reboot="Reboot"
+poweroff="Power off"
+greeting="Session"
+if [ "$LANG" = "zh_CN.UTF-8" ]; then
+    lock="锁屏"
+    logout="登出"
+    reboot="重启"
+    poweroff="关机"
+    greeting="会话选项"
+fi
+
+# menu_cmd() {
+#     dmenu -p $greeting -sb "#689d68" -sf "#101010" -fn "monospace 14"
+# }
+menu_cmd() {
+    rofi -dmenu -p "$greeting"
+}
+
+selecton="${lock}\n${logout}\n${reboot}\n${poweroff}"
+selected=$(printf "$selecton" | menu_cmd)
+case "$selected" in
+    "$lock")
+        $logman_bin lock ;;
+    "$logout")
+        $logman_bin logout ;;
+    "$reboot")
+        $logman_bin reboot ;;
+    "$poweroff")
+        $logman_bin poweroff ;;
+esac
