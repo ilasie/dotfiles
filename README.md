@@ -1,5 +1,6 @@
 my own system configs repo
 
+- `etc`: configs for `/etc`
 - `.config`: configs for the user level
 - `.local/bin`: self-used scripts
 - `share`: comprehensive config examples, templates, or reassociated things
