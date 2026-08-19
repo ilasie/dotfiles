@@ -1,0 +1,11 @@
+UXTerm*faceName: Iosevka
+UXTerm*faceNameDoublesize: Noto Sans CJK SC
+UXTerm*font: JetBrainsMono Nerd Font Mono
+UXTerm*faceSize: 18
+
+UXTerm*eightBitInput: true
+UXTerm*selectToClipboard: true
+UXTerm*utf8: true
+UXTerm*utf8Title: true
+
+UXTerm*background: rgb:28/28/28

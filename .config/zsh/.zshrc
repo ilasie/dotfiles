@@ -152,8 +152,19 @@ extract() {
 
 # Plus
 
+########## zoxide ##########
 eval "$(zoxide init zsh)"
 
+function zc() {
+    __zoxide_doctor
+    \builtin local result
+    result="$(\command zoxide query --interactive -- "$@")" && nvim "${result}"
+}
+
+export _ZO_EXCLUDE_DIRS="/tmp:/var:/node_modules"
+
+######### completion ##########
+#
 autoload -Uz compinit
 
 compinit -d "$XDG_DATA_HOME/zsh/zcompdump"
@@ -188,8 +199,8 @@ alias diff='diff --color=auto'
 # allow using environment variables in the prompt
 setopt prompt_subst
 
-domain="%B%F{cyan}%n@%M%f%b "
-dir="%B%F{blue}%1~%f%b "
+domain="%B%F{cyan}%n@%M%f%b"
+dir="%B%F{blue}%1~%f%b"
 colon="%(?.%F{green}.%F{red})%%%f "
 
 # credits: https://salferrarello.com/zsh-git-status-prompt/
@@ -198,7 +209,7 @@ colon="%(?.%F{green}.%F{red})%%%f "
 autoload -Uz add-zsh-hook vcs_info
 add-zsh-hook precmd vcs_info
 # use '' to ensure dynamic environment variables
-PROMPT='$domain$dir%B%F{magenta}${vcs_info_msg_0_}%f%b$colon'
+PROMPT='$domain:$dir%B%F{magenta}${vcs_info_msg_0_}%f%b$colon'
 
 # Enable checking for (un)staged changes, enabling use of %u and %c
 zstyle ':vcs_info:*' check-for-changes true

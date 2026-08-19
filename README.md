@@ -1,8 +1,9 @@
 my own system configs repo
 
-- `.config`: user's global config
-- `.local/bin`: self-made used script
-- `.local/share`: config for non-global situation
+- `.config`: configs for the user level
+- `.local/bin`: self-used scripts
+- `share`: comprehensive config examples, templates, or reassociated things
+- `windows`: windows applications' configs
 
 #### Credits
 - [unixchad](https://codeberg.org/unixchad)

@@ -11,7 +11,7 @@ for _d in /usr/sbin /sbin /usr/local/sbin ; do
 done
 unset _d
 
-# export MANPATH="/usr/local/man:$MANPATH"
+export MANPATH="/usr/local/man:$MANPATH"
 
 # You may need to manually set your language environment
 export LANG=zh_CN.UTF-8
@@ -49,6 +49,11 @@ export LEAN_UPSTREAM=https://mirrors.sjtug.edu.cn/lean4/
 
 # Set PATH for rust
 source $HOME/.cargo/env
+
+# Set go envs
+export GOPATH=/home/ffuu/.go
+export PATH="$PATH:$GOPATH/bin"
+export GOPROXY=https://goproxy.cn,direct
 
 # Set PATH for python
 case ":${PATH}:" in
