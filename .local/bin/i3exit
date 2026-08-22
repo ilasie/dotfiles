@@ -4,20 +4,20 @@
 lock() {
   i3lock \
     --nofork \
-    --color=00000022 \
+    --color=1d2021e6 \
     --inside-color=00000022 \
-    --ring-color=98971ae6 \
-    --keyhl-color=d79921e6 \
+    --ring-color=458588e6 \
+    --keyhl-color=a89984e6 \
     --bshl-color=d79921e6 \
     --separator-color=458588e6 \
     --insidever-color=00000022 \
-    --ringver-color=98971ae6 \
-    --verif-color=98971ae6 \
+    --ringver-color=458588e6 \
+    --verif-color=b16286e6 \
     --insidewrong-color=00000022 \
     --ringwrong-color=cc241de6 \
     --wrong-color=cc241de6 \
-    --time-color=98971aE6 \
-    --date-color=98971aE6 \
+    --time-color=d79921e6 \
+    --date-color=d79921e6 \
     --blur 9 \
     --clock
 }

@@ -1,0 +1,119 @@
+#! /bin/sh
+# ----
+# udiskman - udisk management wrapper for udisksctl
+# ilasie 2026
+#   new version because the 2025 one was deleted by accident
+# requires:
+#   jq for `jq`
+#   udisks2 for `udisksctl`
+# ----
+
+_menu_title="UDisks to use"
+_menu_action() {
+  echo "Action on $1"
+}
+_menu_unmount="Unmount"
+_menu_mount="Mount"
+_menu_poweroff="Unmount and power off"
+_note_head="udiskman"
+_note_unmount_succeed() {
+  echo "Unmounted $1"
+}
+_note_unmount_fail() {
+  echo "Failed to unmount $1"
+}
+_note_poweroff_succeed() {
+  echo "Powered off $1. It can be safely ejected"
+}
+_note_poweroff_fail() {
+  echo "Failed to power off $1"
+}
+_note_mount_succeed() {
+  echo "Mounted $1 at $2"
+}
+_note_mount_fail() {
+  echo "Failed to mount $1"
+}
+
+if [ "$LANG" = "zh_CN.UTF-8" ]; then
+  _menu_title="可用U盘"
+  _menu_action() {
+    echo "在$1上的操作"
+  }
+  _menu_unmount="卸载"
+  _menu_mount="挂载"
+  _menu_poweroff="卸载并断电"
+  _note_head="udiskman"
+  _note_unmount_succeed() {
+    echo "$1已卸载"
+  }
+  _note_unmount_fail() {
+    echo "未能卸载$1"
+  }
+  _note_poweroff_succeed() {
+    echo "$1已卸载并断电，可安全拔出"
+  }
+  _note_poweroff_fail() {
+    echo "未能卸载并断电$1"
+  }
+  _note_mount_succeed() {
+    echo "$1已挂载至$2"
+  }
+  _note_mount_fail() {
+    echo "未能挂载$1"
+  }
+fi
+_menu() {
+  rofi -dmenu -p "$1"
+}
+
+_list_udisks() {
+  lsblk -J -o NAME,SIZE,LABEL,FSTYPE,HOTPLUG,TYPE 2>/dev/null | \
+  jq -r '
+    .. | objects | select(has("name")) |
+    select(.type == "part" or (.type == "disk" and (.children // []) == [])) |
+    select(.hotplug == true) |
+    select(.fstype != null and .fstype != "swap") |
+    "/dev/" + .name + ":" + (.label // "(no label)") + ":" + .size
+  '
+}
+
+udisk=$(_list_udisks | _menu "$_menu_title")
+[ -z "$udisk" ] && exit 0;
+
+dev=$(printf "$udisk" | cut -d':' -f1)
+mountpoint=$(lsblk -no MOUNTPOINT "$dev" 2>/dev/null)
+if [ -n "$mountpoint" ]; then
+  action=$(printf "$_menu_unmount\n$_menu_poweroff" | _menu $(_menu_action "'$udisk'"))
+  [ -z "$action" ] && exit 0
+  case "$action" in
+    "$_menu_unmount")
+      if udisksctl unmount -b "$dev" 2>/dev/null; then
+        dunstify "$_note_head" $(_note_unmount_succeed "$dev")
+      else
+        dunstify -u critical "$_note_head" $(_note_unmount_fail "$dev")
+      fi
+      ;;
+    "$_menu_poweroff")
+      if udisksctl unmount -b "$dev" 2>/dev/null && udisksctl power-off -b "$dev" 2>/dev/null; then
+        dunstify "$_note_head" $(_note_poweroff_succeed "$dev")
+      else
+        dunstify -u critical "$_note_head" $(_note_poweroff_fail "$dev")
+      fi
+      ;;
+  esac
+else
+  action=$(echo "$_menu_mount" | _menu $(_menu_action "'$udisk'"))
+  [ -z "$action" ] && exit 0
+
+  if [ "$action" = "$_menu_mount" ]; then
+    if udisksctl mount -b "$dev" 2>/dev/null; then
+      mp=$(lsblk -no MOUNTPOINT "$dev" 2>/dev/null)
+      dunstify "$_note_head" $(_note_mount_succeed "$dev" "$mp")
+    else
+      dunstify -u critical "$_note_head" $(_note_mount_fail "$dev")
+    fi
+  fi
+fi
+
+# vim:ft=sh:sw=2
