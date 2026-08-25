@@ -1,4 +1,6 @@
 #!/bin/sh
-# from ueberzugpp/scripts/lf/cleaner
-
-ueberzugpp cmd -s $UB_SOCKET -a remove -i PREVIEW
+# ----ilasie
+# cleaner
+#   from: https://github.com/gokcehan/lf/wiki/Previews
+# ----
+[ -p "$FIFO_UEBERZUG" ] && printf '{"action":"remove","identifier":"preview"}\n' >"$FIFO_UEBERZUG"

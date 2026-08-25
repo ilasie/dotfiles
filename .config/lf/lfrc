@@ -1,13 +1,16 @@
+# ----
 # lfrc
-# author: ilasie
-# since: 2026
+# ilasie 2026
+# credits:
+#   unixchad
+#   gokcehan/lf/wiki
+# ----
 
 set shell /bin/sh
 set shellopts '-eu'
 set ifs "\n"
 
-set preview true
-set previewer ~/.config/lf/preview
+set previewer ~/.config/lf/previewer
 set cleaner ~/.config/lf/cleaner
 set icons true
 
@@ -55,8 +58,8 @@ map .r source ~/.config/lf/lfrc
 
 map f :filter
 
-map o :push %touch<space>
-map O :push %mkdir<space>
-map a :rename
+map a :push %touch<space>
+map A :push %mkdir<space>
+map r :rename
 map e $$EDITOR "$f"
 map D delete
