@@ -1,7 +1,10 @@
 #!/bin/sh
 # ----ilasie
-# previewer
-#   from: https://github.com/gokcehan/wiki/Previews
+# previewer modified
+# from: https://github.com/gokcehan/wiki/Previews
+# requires:
+#   batcat
+#   ueberzugpp
 # ----
 draw() {
   path="$(readlink -f -- "$1" | sed 's/\\/\\\\/g;s/"/\\"/g')"
@@ -51,7 +54,8 @@ case "$(file -Lb --mime-type -- "$file")" in
     fi
     ;;
   text/*)
-    exec cat -v "$file"
+    #exec cat -v "$file"
+    exec batcat --color=always -p "$file"
     ;;
 esac
 

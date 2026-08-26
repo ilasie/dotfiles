@@ -1,33 +1,57 @@
-#@auth ilasie
-#@since 2026
-
-#@inspired of: The Rad Lectures
+# ----
+# .zshrc
+# ilasie 2026
+# inspired by:
+#   The Rad Lectures @ YouTobe
+# ----
 
 # User configuration
 
 # yazi
-function y() {
-  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-  yazi "$@" --cwd-file="$tmp"
-  IFS= read -r -d '' cwd < "$tmp"
-  [ -n "$cwd" ] && [ "$cwd" != $PWD ] && builtin cd -- "$cwd"
-  rm -f -- "$tmp"
-}
+#function y() {
+#  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+#  yazi "$@" --cwd-file="$tmp"
+#  IFS= read -r -d '' cwd < "$tmp"
+#  [ -n "$cwd" ] && [ "$cwd" != $PWD ] && builtin cd -- "$cwd"
+#  rm -f -- "$tmp"
+#}
 #
 # lf
-#alias lf='lfub'
-# 
+alias lf='lfub'
+# ----ilasie
+# from /usr/share/doc/lf/examples/lfcd.sh
+# ----
+# Change working dir in shell to last dir in lf on exit (adapted from ranger).
+#
+# You need to either copy the content of this file to your shell rc file
+# (e.g. ~/.bashrc) or source this file directly:
+#
+#     LFCD="/path/to/lfcd.sh"
+#     if [ -f "$LFCD" ]; then
+#         source "$LFCD"
+#     fi
+#
+# You may also like to assign a key (Ctrl-O) to this command:
+#
+#     bind '"\C-o":"lfcd\C-m"'  # bash
+#     bindkey -s '^o' 'lfcd\n'  # zsh
+#
+lfcd () {
+    # `command` is needed in case `lfcd` is aliased to `lf`
+    cd "$(command lfub -print-last-dir "$@")"
+}
+bindkey -s '^o' 'lfcd\n'
+ 
 # cat
-alias cat='batcat -p'
+alias cat='batcat --color=always -p'
 
 # Keymap
 #
-function _copy_current_terminal_session() {
+_copy_current_terminal_session() {
   alacritty --working-directory "$PWD" >/dev/null 2>&1 &
   disown
 }
 alias ,.=_copy_current_terminal_session
-
 
 # Plugin
 ZPLUGINDIR="$XDG_DATA_HOME/zsh/plugins"
@@ -164,10 +188,25 @@ function zc() {
 export _ZO_EXCLUDE_DIRS="/tmp:/var:/node_modules"
 
 ######### completion ##########
-#
+
+# ZSH_LOCAL_FPATH="$XDG_CONFIG_HOME/zsh/zsh-completions"
+ZCOMP_DUMP="$XDG_DATA_HOME/zsh/zcompdump"
+# 
+# if [[ -d "$ZSH_LOCAL_FPATH" ]]; then
+#     fpath=($ZSH_LOCAL_FPATH $fpath)
+# fi
+
 autoload -Uz compinit
 
-compinit -d "$XDG_DATA_HOME/zsh/zcompdump"
+if [[ -f "$ZCOMP_DUMP" ]] || {
+    local -a recorded_fpath
+    recorded_fpath=(${(z)"$(sed -n 's/^#fpath=//p' "$ZCOMP_DUMP")"})
+    [[ "${recorded_fpath[*]}" != "${fpath[*]}" ]]
+}; then
+    compinit -d "$ZCOMP_DUMP"
+else
+    compinit -C -d "$ZCOMP_DUMP"
+fi
 
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'

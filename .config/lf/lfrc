@@ -4,37 +4,64 @@
 # credits:
 #   unixchad
 #   gokcehan/lf/wiki
+# requires:
+#   bat[cat]
+#   fzf
+#   ripgrep
+#   git
+#   zoxide
 # ----
 
 set shell /bin/sh
 set shellopts '-eu'
 set ifs "\n"
-
 set previewer ~/.config/lf/previewer
 set cleaner ~/.config/lf/cleaner
 set icons true
-
-set info size:time
 set dircounts true
 set number true
 set relativenumber true
-set ratios 1:2:3
 set drawbox true
 
+set info custom
+cmd on-load &{{
+    cd "$(dirname "$1")" || exit 1
+    [ "$(git rev-parse --is-inside-git-dir 2>/dev/null)" = false ] || exit 0
+
+    cmds=""
+    for file in "$@"; do
+        case "$file" in
+            */.git|*/.git/*) continue;;
+        esac
+        status=$(git status --porcelain --ignored -- "$file" | cut -c1-2 | head -n1)
+        if [ -n "$status" ]; then
+            cmds="${cmds}addcustominfo ${file} \"$status\"; "
+        else
+            cmds="${cmds}addcustominfo ${file} ''; "
+        fi
+    done
+
+    lf -remote "send $id :$cmds"
+}}
+
+# undefine default open behavior binding `xdg-open`
+cmd open %{{
+    true
+}}
 
 cmd extract %{{
   printf "extract file?[y/n]"
   read choice
   if [ "$choice" = "y" ]; then
   case "$f" in
-    *.tar) tar xf "$f" ;;
+    *.tar|*.tar.xz|*.txz) tar xf "$f" ;;
     *.zip|*.apk) unzip "$f" -d "$(basename $f | sed -E 's/.apk$|.zip$//')" ;;
     *.7z) 7z x "$f" ;;
     *.tar.gz|*.tgz|*.taz) tar xzf "$f" ;;
     *.gz) gunzip -k "$f" ;;
     *.tar.bz2|*.tbz2|*.tbz|*.tz2|*.tb2) tar xjf "$f" ;;
     *.bz2) bzip2 -dk "$f" ;;
-    *.tar.xz|*.txz) tar xJf "$f" ;;
+    #*.tar.xz|*.txz) tar xJf "$f" ;;
     *.xz) xz -dk "$f" ;;
     *.tar.zst|*.tzst) tar xf "$f" --zstd ;;
     *.zst) zstd -dk "$f" ;;
@@ -43,8 +70,8 @@ cmd extract %{{
   fi
   lf -remote "send clear"
 }}
-map xx extract
 
+set ratios 1:2:3
 cmd toggle-preview %{{
   if [ "$lf_preview" = true ]; then
     lf -remote "send $id :set preview false; set ratios 1:5"
@@ -53,13 +80,50 @@ cmd toggle-preview %{{
   fi
 }}
 
+cmd z %{{
+    result="$(zoxide query --exclude "$PWD" "$@" | sed 's/\\/\\\\/g;s/"/\\"/g')"
+    lf -remote "send $id cd \"$result\""
+}}
 
-map .r source ~/.config/lf/lfrc
+cmd zi ${{
+    result="$(zoxide query -i | sed 's/\\/\\\\/g;s/"/\\"/g')"
+    lf -remote "send $id cd \"$result\""
+}}
 
+cmd on-cd &{{
+    zoxide add "$PWD"
+}}
+
+cmd fzf_search ${{
+    cmd="rg --column --line-number --no-heading --color=always --smart-case"
+    fzf --ansi --disabled --layout=reverse --header="Search in files" --delimiter=: \
+        --bind="start:reload([ -n {q} ] && $cmd -- {q} || true)" \
+        --bind="change:reload([ -n {q} ] && $cmd -- {q} || true)" \
+        --bind='enter:become(lf -remote "send $id select \"$(printf "%s" {1} | sed '\''s/\\/\\\\/g;s/"/\\"/g'\'')\"")' \
+        #--preview='cat -- {1}' # Use your favorite previewer here (bat, source-highlight, etc.), for example:
+        #--preview-window='+{2}-/2' \
+        --preview='batcat --color=always --highlight-line={2} -- {1}'
+        # Alternatively you can even use the same previewer you've configured for lf
+        #--preview='~/.config/lf/cleaner; ~/.config/lf/previewer {1} "$FZF_PREVIEW_COLUMNS" "$FZF_PREVIEW_LINES" "$FZF_PREVIEW_LEFT" "$FZF_PREVIEW_TOP"'
+}}
+
+# defaultly-embeded delete behavior
+# cmd delete ${{
+#     set -f
+#     printf "$fx\n"
+#     printf "delete? [y/N] "
+#     read ans
+#     [ "$ans" = "y" ] && rm -rf $fx
+# }}
+
+map xx extract
+map xr source ~/.config/lf/lfrc
+map zp toggle-preview
+map gs :fzf_search
 map f :filter
-
 map a :push %touch<space>
 map A :push %mkdir<space>
 map r :rename
-map e $$EDITOR "$f"
-map D delete
+map <delete> delete
+map <c-up> :half-up
+map <c-down> :half-down

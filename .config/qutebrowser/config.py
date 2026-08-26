@@ -11,14 +11,13 @@ config.load_autoconfig(False)
 
 term = 'alacritty -e'
 
-# required to create link `/bin/yazi` if it had not been there
-fileChooser = shlex.split(term) + ['yazi', '--chooser-file={}']
+fileChooser = shlex.split(term) + ['lf', '-selection-path={}']
 c.fileselect.handler = "external"
 c.fileselect.folder.command = fileChooser
 c.fileselect.multiple_files.command = fileChooser
 c.fileselect.single_file.command = fileChooser
 
-c.url.start_pages = 'about:blank'
+c.url.start_pages = 'qute://help'
 c.url.default_page = 'about:blank'
 c.tabs.last_close = "startpage"
 c.url.searchengines = {
